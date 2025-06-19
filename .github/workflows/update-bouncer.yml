@@ -1,0 +1,36 @@
+name: Update crowdsec firewall bouncer
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Get current version
+        id: current
+        run: echo "version=$(grep -oP '(?<=ARG CS_VERSION=).*' Dockerfile)" >> "$GITHUB_OUTPUT"
+
+      - name: Get latest release
+        id: latest
+        run: |
+          latest=$(curl -s https://api.github.com/repos/crowdsecurity/cs-firewall-bouncer/releases/latest | jq -r '.tag_name')
+          echo "version=$latest" >> "$GITHUB_OUTPUT"
+
+      - name: Update version
+        if: steps.current.outputs.version != steps.latest.outputs.version
+        run: |
+          sed -i "s/ARG CS_VERSION=.*/ARG CS_VERSION=${{ steps.latest.outputs.version }}/" Dockerfile
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git commit -am "chore: update bouncer to ${{ steps.latest.outputs.version }}"
+          git push
