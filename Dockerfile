@@ -2,10 +2,18 @@ FROM alpine:latest AS builder
 
 ARG CS_VERSION=v0.0.33
 
+ARG TARGETPLATFORM
+
 RUN apk add --no-cache curl ca-certificates tar
 
 WORKDIR /tmp/bouncer
-RUN curl -L -o bouncer.tgz https://github.com/crowdsecurity/cs-firewall-bouncer/releases/download/${CS_VERSION}/crowdsec-firewall-bouncer-linux-amd64.tgz \
+RUN case "$TARGETPLATFORM" in \
+        "linux/amd64") CS_ARCH=amd64 ;; \
+        "linux/arm64") CS_ARCH=arm64 ;; \
+        "linux/arm/v7") CS_ARCH=armv7 ;; \
+        *) echo "Unsupported architecture $TARGETPLATFORM" && exit 1 ;; \
+    esac \
+    && curl -L -o bouncer.tgz "https://github.com/crowdsecurity/cs-firewall-bouncer/releases/download/${CS_VERSION}/crowdsec-firewall-bouncer-linux-${CS_ARCH}.tgz" \
     && tar -xzf bouncer.tgz \
     && mv crowdsec-firewall-bouncer*/crowdsec-firewall-bouncer /crowdsec-firewall-bouncer \
     && mv crowdsec-firewall-bouncer*/config/crowdsec-firewall-bouncer.yaml /crowdsec-firewall-bouncer.yaml
@@ -16,7 +24,7 @@ ENV CROWDSEC_API_KEY="" \
     CROWDSEC_PORT="8080" \
     CROWDSEC_LAPI_URL=""
 
-RUN apk add --no-cache iptables gettext ca-certificates
+RUN apk add --no-cache iptables ipset gettext ca-certificates
 
 COPY --from=builder /crowdsec-firewall-bouncer /usr/local/bin/crowdsec-firewall-bouncer
 COPY --from=builder /crowdsec-firewall-bouncer.yaml /defaults/crowdsec-firewall-bouncer.yaml
