@@ -14,6 +14,8 @@ The container expects at least the following environment variables:
 
 - `CROWDSEC_API_KEY` – API key used by the bouncer
 - `CROWDSEC_PORT` – port where the CrowdSec LAPI is reachable (default: `8080`)
+- `PROMETHEUS_ENABLED` – set to `true` to enable the Prometheus endpoint (default: `false`)
+- `PROMETHEUS_PORT` – port for the Prometheus metrics endpoint (default: `60601`)
 
 Optionally `CROWDSEC_LAPI_URL` can specify the full URL to the LAPI.
 
@@ -26,6 +28,8 @@ docker run -d \
   -e CROWDSEC_API_KEY=<API_KEY> \
   -e CROWDSEC_PORT=8080 \
   -e CROWDSEC_LAPI_URL=http://127.0.0.1:8080 \
+  -e PROMETHEUS_ENABLED=false \
+  -e PROMETHEUS_PORT=60601 \
   -v /path/to/config:/etc/crowdsec \
   --network=host \
   crowdsec-firewall-bouncer
