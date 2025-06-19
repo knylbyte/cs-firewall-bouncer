@@ -1,13 +1,17 @@
 FROM alpine:latest AS builder
 
+# This version is automatically updated by the workflow
 ARG CS_VERSION=v0.0.33
 
 ARG TARGETPLATFORM
 
-RUN apk add --no-cache curl ca-certificates tar
+RUN apk add --no-cache curl ca-certificates tar jq
 
 WORKDIR /tmp/bouncer
-RUN case "$TARGETPLATFORM" in \
+RUN if [ "$CS_VERSION" = "latest" ]; then \
+        CS_VERSION=$(curl -s https://api.github.com/repos/crowdsecurity/cs-firewall-bouncer/releases/latest | jq -r '.tag_name'); \
+    fi \
+    && case "$TARGETPLATFORM" in \
         "linux/amd64") CS_ARCH=amd64 ;; \
         "linux/arm64") CS_ARCH=arm64 ;; \
         "linux/arm/v7") CS_ARCH=armv7 ;; \
