@@ -33,6 +33,11 @@ docker run -d \
 
 The image exposes no ports and is based on a minimal Alpine system.
 
+During build a self-signed certificate valid for ten years is generated in
+`/etc/crowdsec/tls`. HTTPS remains disabled by default; uncomment the relevant
+options in the configuration if you want to use it. Logs are written to
+`/var/log/crowdsec`.
+
 ## Notes
 
 - Modifying firewall rules requires elevated privileges (`--cap-add=NET_ADMIN --cap-add=NET_RAW` or `--privileged`).
