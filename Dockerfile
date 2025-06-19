@@ -25,13 +25,20 @@ ENV CROWDSEC_PORT="8080" \
 
 RUN apk update \
     && apk upgrade \
-    && apk add --no-cache iptables ipset gettext ca-certificates tzdata
+    && apk add --no-cache iptables ipset gettext ca-certificates tzdata openssl
 ENV TZ=UTC
 
 COPY --from=builder /crowdsec-firewall-bouncer /usr/local/bin/crowdsec-firewall-bouncer
 COPY --from=builder /crowdsec-firewall-bouncer.yaml /defaults/crowdsec-firewall-bouncer.yaml
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+RUN mkdir -p /etc/crowdsec/tls /var/log/crowdsec \
+    && openssl req -x509 -nodes -newkey rsa:2048 -days 3650 \
+        -subj "/CN=crowdsec" \
+        -keyout /etc/crowdsec/tls/key.pem \
+        -out /etc/crowdsec/tls/cert.pem \
+    && cp /etc/crowdsec/tls/cert.pem /etc/crowdsec/tls/ca.crt \
+    && sed -i 's#^log_dir: .*#log_dir: /var/log/crowdsec#' /defaults/crowdsec-firewall-bouncer.yaml
 
 VOLUME ["/etc/crowdsec"]
 
