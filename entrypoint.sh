@@ -13,7 +13,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
     BACKEND="$BACKEND" API_KEY="$API_KEY" envsubst < "$DEFAULT_CONFIG" > "$CONFIG_FILE"
 fi
 
-API_URL=${CROWDSEC_LAPI_URL:-http://host.docker.internal:${CROWDSEC_PORT:-8080}}
+API_URL=${CROWDSEC_LAPI_URL:-http://127.0.0.1:${CROWDSEC_PORT:-8080}}
 # Ensure trailing slash
 case $API_URL in
     */) ;;
