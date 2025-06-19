@@ -24,7 +24,7 @@ ENV CROWDSEC_API_KEY="" \
     CROWDSEC_PORT="8080" \
     CROWDSEC_LAPI_URL=""
 
-RUN apk add --no-cache iptables gettext ca-certificates
+RUN apk add --no-cache iptables ipset gettext ca-certificates
 
 COPY --from=builder /crowdsec-firewall-bouncer /usr/local/bin/crowdsec-firewall-bouncer
 COPY --from=builder /crowdsec-firewall-bouncer.yaml /defaults/crowdsec-firewall-bouncer.yaml
