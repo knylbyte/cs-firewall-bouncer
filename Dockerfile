@@ -21,7 +21,9 @@ RUN case "$TARGETPLATFORM" in \
 FROM alpine:latest
 
 ENV CROWDSEC_PORT="8080" \
-    CROWDSEC_LAPI_URL=""
+    CROWDSEC_LAPI_URL="" \
+    PROMETHEUS_ENABLED="false" \
+    PROMETHEUS_PORT="60601"
 
 RUN apk update \
     && apk upgrade \

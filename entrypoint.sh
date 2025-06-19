@@ -25,4 +25,10 @@ if [ -n "$CROWDSEC_API_KEY" ]; then
     sed -i "s#^api_key:.*#api_key: ${CROWDSEC_API_KEY}#" "$CONFIG_FILE"
 fi
 
+# Configure Prometheus metrics if requested
+PROMETHEUS_ENABLED=${PROMETHEUS_ENABLED:-false}
+PROMETHEUS_PORT=${PROMETHEUS_PORT:-60601}
+sed -i "0,/enabled:/s/enabled:.*/enabled: ${PROMETHEUS_ENABLED}/" "$CONFIG_FILE"
+sed -i "0,/listen_port:/s/listen_port:.*/listen_port: ${PROMETHEUS_PORT}/" "$CONFIG_FILE"
+
 exec crowdsec-firewall-bouncer -c "$CONFIG_FILE"
