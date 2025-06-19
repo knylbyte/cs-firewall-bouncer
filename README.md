@@ -25,6 +25,7 @@ docker run -d \
   --cap-add=NET_ADMIN --cap-add=NET_RAW \
   -e CROWDSEC_API_KEY=<API_KEY> \
   -e CROWDSEC_PORT=8080 \
+  -e CROWDSEC_LAPI_URL=http://127.0.0.1:8080 \
   -v /path/to/config:/etc/crowdsec \
   --network=host \
   crowdsec-firewall-bouncer
