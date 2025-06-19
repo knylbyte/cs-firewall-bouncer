@@ -27,7 +27,7 @@ ENV CROWDSEC_PORT="8080" \
 
 RUN apk update \
     && apk upgrade \
-    && apk add --no-cache iptables ipset gettext ca-certificates tzdata openssl
+    && apk add --no-cache nftables iptables ipset gettext ca-certificates tzdata openssl
 ENV TZ=UTC
 
 COPY --from=builder /crowdsec-firewall-bouncer /usr/local/bin/crowdsec-firewall-bouncer
