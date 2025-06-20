@@ -23,15 +23,17 @@ RUN if [ "$CS_VERSION" = "latest" ]; then \
     && mv crowdsec-firewall-bouncer*/config/crowdsec-firewall-bouncer.yaml /crowdsec-firewall-bouncer.yaml
 
 FROM alpine:latest
+ARG CS_VERSION
 
 ENV CROWDSEC_PORT="8080" \
     CROWDSEC_LAPI_URL="" \
     PROMETHEUS_ENABLED="false" \
-    PROMETHEUS_PORT="60601"
+    PROMETHEUS_PORT="60601" \
+    BOUNCER_VERSION="$CS_VERSION"
 
 RUN apk update \
     && apk upgrade \
-    && apk add --no-cache nftables nftables iptables ipset gettext ca-certificates tzdata openssl
+    && apk add --no-cache nftables nftables iptables ipset gettext ca-certificates tzdata openssl curl jq
 ENV TZ=UTC
 
 COPY --from=builder /crowdsec-firewall-bouncer /usr/local/bin/crowdsec-firewall-bouncer
