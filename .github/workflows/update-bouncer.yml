@@ -22,11 +22,7 @@ jobs:
         id: current
         run: |
           git fetch origin main --tags
-          current=$(git describe --abbrev=0 --tags origin/main 2>/dev/null)
-          if [ -z "$current" ]; then
-            echo "No tag on main branch, aborting." >&2
-            exit 1
-          fi
+          current=$(git describe --abbrev=0 --tags origin/main 2>/dev/null || true)
           echo "version=$current" >> "$GITHUB_OUTPUT"
 
       - name: Get latest release
@@ -45,7 +41,9 @@ jobs:
           sed -i "s/ARG CS_VERSION=.*/ARG CS_VERSION=${{ steps.latest.outputs.version }}/" Dockerfile
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git commit -am "chore: update bouncer to ${{ steps.latest.outputs.version }}"
-          git push
-          git tag -a "${{ steps.latest.outputs.version }}" -m "Release ${{ steps.latest.outputs.version }}"
+          if ! git diff --quiet Dockerfile; then
+            git commit -am "chore: update bouncer to ${{ steps.latest.outputs.version }}"
+            git push
+          fi
+          git tag -a -f "${{ steps.latest.outputs.version }}" -m "Release ${{ steps.latest.outputs.version }}"
           git push origin "${{ steps.latest.outputs.version }}"
