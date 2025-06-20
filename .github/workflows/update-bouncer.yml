@@ -18,12 +18,23 @@ jobs:
 
       - name: Get current version
         id: current
-        run: echo "version=$(grep -oP '(?<=ARG CS_VERSION=).*' Dockerfile)" >> "$GITHUB_OUTPUT"
+        run: |
+          git fetch origin main --tags
+          current=$(git describe --abbrev=0 --tags origin/main 2>/dev/null)
+          if [ -z "$current" ]; then
+            echo "No tag on main branch, aborting." >&2
+            exit 1
+          fi
+          echo "version=$current" >> "$GITHUB_OUTPUT"
 
       - name: Get latest release
         id: latest
         run: |
           latest=$(curl -s https://api.github.com/repos/crowdsecurity/cs-firewall-bouncer/releases/latest | jq -r '.tag_name')
+          if [ -z "$latest" ] || [ "$latest" = "null" ]; then
+            echo "Failed to fetch latest release tag." >&2
+            exit 1
+          fi
           echo "version=$latest" >> "$GITHUB_OUTPUT"
 
       - name: Update version
