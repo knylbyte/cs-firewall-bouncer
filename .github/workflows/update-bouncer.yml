@@ -47,3 +47,12 @@ jobs:
           fi
           git tag -a -f "${{ steps.latest.outputs.version }}" -m "Release ${{ steps.latest.outputs.version }}"
           git push origin "${{ steps.latest.outputs.version }}"
+
+      - name: Create GitHub release
+        if: steps.current.outputs.version != steps.latest.outputs.version
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.latest.outputs.version }}
+          name: Release ${{ steps.latest.outputs.version }}
+          body: |
+            The GitHub Action workflow automatically updated the crowdsec-firewall-bouncer to version ${{ steps.latest.outputs.version }}.
