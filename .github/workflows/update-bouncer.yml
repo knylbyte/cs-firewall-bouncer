@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -56,3 +57,15 @@ jobs:
           name: Release ${{ steps.latest.outputs.version }}
           body: |
             The GitHub Action workflow automatically updated the crowdsec-firewall-bouncer to version ${{ steps.latest.outputs.version }}.
+
+      - name: Trigger docker build workflow
+        if: steps.current.outputs.version != steps.latest.outputs.version
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'docker-build.yml',
+              ref: '${{ steps.latest.outputs.version }}'
+            })
