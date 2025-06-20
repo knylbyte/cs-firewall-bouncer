@@ -34,3 +34,5 @@ jobs:
           git config user.email "github-actions@github.com"
           git commit -am "chore: update bouncer to ${{ steps.latest.outputs.version }}"
           git push
+          git tag -a "${{ steps.latest.outputs.version }}" -m "Release ${{ steps.latest.outputs.version }}"
+          git push origin "${{ steps.latest.outputs.version }}"
