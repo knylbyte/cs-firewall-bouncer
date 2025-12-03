@@ -84,6 +84,20 @@ jobs:
     needs:
       - build
     steps:
+      - name: Get current version from branch
+        if: github.event_name == 'workflow_dispatch'
+        id: latest
+        run: |
+          set -e
+
+          branch="${GITHUB_REF_NAME}"
+          git fetch origin "${branch}" --tags
+
+          tag=$(git describe --abbrev=0 --tags "origin/${branch}" 2>/dev/null || true)
+          tag="${tag#v}"
+
+          echo "version=${tag}" >> "$GITHUB_OUTPUT"
+
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
@@ -108,10 +122,9 @@ jobs:
           images: |
             ${{ env.GHCR_REPO }}
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
             type=semver,pattern={{version}}
-            type=raw,value=latest,enable=${{ github.event_name == 'push' }}
+            type=raw,value=latest,enable=true
+            type=raw,value=${{ steps.latest.output.version }},enable=${{ github.event_name == 'workflow_dispatch' }}
 
       - name: Create manifest list and push
         working-directory: ${{ runner.temp }}/digests
