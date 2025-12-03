@@ -33,12 +33,12 @@ sed -i "0,/listen_port:/s/listen_port:.*/listen_port: ${PROMETHEUS_PORT}/" "$CON
 
 # Inform about update status on startup
 CURRENT_VERSION="${BOUNCER_VERSION:-unknown}"
-LATEST_VERSION=$(curl -s https://api.github.com/repos/crowdsecurity/cs-firewall-bouncer/releases/latest | jq -r '.tag_name' 2>/dev/null || true)
+LATEST_VERSION=$(curl -s https://api.github.com/repos/crowdsecurity/cs-firewall-bouncer/releases/latest --connect-timeout 5 --retry 5 --retry-connrefuse --retry-delay 2 | jq -r '.tag_name' 2>/dev/null || true)
 if [ -n "$LATEST_VERSION" ] && [ "$LATEST_VERSION" != "null" ]; then
     if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
         echo "Running the latest image (version $CURRENT_VERSION)."
     else
-        RELEASES=$(curl -s https://api.github.com/repos/crowdsecurity/cs-firewall-bouncer/releases | jq -r '.[].tag_name' 2>/dev/null || true)
+        RELEASES=$(curl -s https://api.github.com/repos/crowdsecurity/cs-firewall-bouncer/releases --connect-timeout 5 --retry 5 --retry-connrefuse --retry-delay 2 | jq -r '.[].tag_name' 2>/dev/null || true)
         BEHIND=0
         for tag in $RELEASES; do
             [ "$tag" = "$CURRENT_VERSION" ] && break
