@@ -102,6 +102,7 @@ jobs:
           tag=$(git describe --abbrev=0 --tags "origin/${branch}" 2>/dev/null || true)
           tag="${tag#v}"
 
+          echo "found version: ${tag}"
           echo "version=${tag}" >> "$GITHUB_OUTPUT"
 
       - name: Download digests
