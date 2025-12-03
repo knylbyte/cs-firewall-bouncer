@@ -84,6 +84,12 @@ jobs:
     needs:
       - build
     steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          fetch-depth: 0
+        
       - name: Get current version from branch
         if: github.event_name == 'workflow_dispatch'
         id: latest
