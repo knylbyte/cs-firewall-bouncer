@@ -29,7 +29,7 @@ jobs:
       - name: Get latest release
         id: latest
         run: |
-          latest=$(curl -s https://api.github.com/repos/crowdsecurity/cs-firewall-bouncer/releases/latest | jq -r '.tag_name')
+          latest=$(curl -s https://api.github.com/repos/crowdsecurity/cs-firewall-bouncer/releases/latest --connect-timeout 5 --retry 5 --retry-connrefuse --retry-delay 2 | jq -r '.tag_name')
           if [ -z "$latest" ] || [ "$latest" = "null" ]; then
             echo "Failed to fetch latest release tag." >&2
             exit 1
