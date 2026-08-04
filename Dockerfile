@@ -1,7 +1,7 @@
 FROM alpine:latest AS builder
 
 # This version is automatically updated by the workflow
-ARG CS_VERSION=v0.0.34
+ARG CS_VERSION=v0.0.36
 
 ARG TARGETPLATFORM
 
