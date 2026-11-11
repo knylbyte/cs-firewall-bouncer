@@ -29,7 +29,7 @@ jobs:
       - name: Get latest release
         id: latest
         run: |
-          latest=$(curl -s https://api.github.com/repos/crowdsecurity/cs-firewall-bouncer/releases/latest --connect-timeout 5 --retry 5 --retry-connrefuse --retry-delay 2 | jq -r '.tag_name')
+          latest=$(curl -s https://api.github.com/repos/crowdsecurity/cs-firewall-bouncer/releases/latest --connect-timeout 5 --retry 5 --retry-delay 2 | jq -r '.tag_name')
           if [ -z "$latest" ] || [ "$latest" = "null" ]; then
             echo "Failed to fetch latest release tag." >&2
             exit 1
@@ -43,7 +43,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           if ! git diff --quiet Dockerfile; then
-            git commit -am "chore: update bouncer to ${{ steps.latest.outputs.version }}"
+            git commit -am "ci(chore): update bouncer to ${{ steps.latest.outputs.version }}"
             git push
           fi
           git tag -a -f "${{ steps.latest.outputs.version }}" -m "Release ${{ steps.latest.outputs.version }}"
